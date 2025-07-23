@@ -9,7 +9,7 @@ export const useSwarmStore = create(
       swarmConfig: creativeArchitectSwarm,
       nodes: creativeArchitectSwarm.nodes,
       edges: creativeArchitectSwarm.edges,
-      globalSignal: creativeArchitectSwarm.globalSignal,
+      globalSignal: { ...creativeArchitectSwarm.globalSignal, personaState: { persona_dna: personaDna } },
       
       // Execution State
       isExecuting: false,

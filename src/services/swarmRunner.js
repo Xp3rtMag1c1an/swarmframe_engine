@@ -45,7 +45,10 @@ export class SwarmRunner {
           const startTime = Date.now();
           const prompts = await loadPromptsForNode(node.type, globalSignal.goal);
           const bestPrompt = prompts[0]?.content || node.data.prompt; // Use best match or fallback
-          const result = await executePrompt(bestPrompt, {
+          const persona = useSwarmStore.getState().globalSignal.personaState.current_persona;
+          const dna = personaDna[persona] || [];
+          const enhancedPrompt = `${bestPrompt} [Persona DNA: ${dna.join(', ')}]`;
+          const result = await executePrompt(enhancedPrompt, {
             ...input,
             signal: globalSignal,
             anatomy: node.data.anatomy,

@@ -1,0 +1,64 @@
+{
+  "prompts": [
+    {
+      "category": "Meta-Ethical Foresight",
+      "prompt": "Construct a multi-layered ethical decision framework that remains coherent across three incompatible moral theories (e.g., virtue ethics, utilitarianism, deontology). Stress-test it on an unforeseen AI governance dilemma set in the year 2100."
+    },
+    {
+      "category": "Trans-Disciplinary Synthesis",
+      "prompt": "Fuse insights from quantum field theory, Mahayana Buddhist philosophy, and evolutionary psychology to propose a novel model of consciousness, then outline experiments that could falsify it."
+    },
+    {
+      "category": "Algorithmic Epistemology",
+      "prompt": "Decompose your own reasoning algorithm into explicit epistemic operators (e.g., induction, abduction, Bayesian update). Identify where each operator might introduce bias and propose self-corrective safeguards."
+    },
+    {
+      "category": "Counterfactual Paradigm Shifts",
+      "prompt": "Imagine Alan Turing had lived to see modern deep learning. Generate a counterfactual timeline showing how his extended influence might have altered AI research milestones and societal impact."
+    },
+    {
+      "category": "Uncertainty Frontier Exploration",
+      "prompt": "Map the current frontiers of scientific ignorance in cosmology, neuroscience, and linguistics. For each frontier, draft a research agenda that maximizes information gain per experimental dollar."
+    },
+    {
+      "category": "Hyper-Analogy Forge",
+      "prompt": "Create a chain of five escalating analogies that link black-hole thermodynamics to classroom pedagogy, ensuring each step preserves explanatory fidelity. Reflect on where the analogy breaks."
+    },
+    {
+      "category": "Temporal Ontology Probing",
+      "prompt": "Compare three competing ontologies of time (presentism, eternalism, growing-block). Evaluate how each ontology would reinterpret quantum entanglement experiments."
+    },
+    {
+      "category": "Embodied Cognition Thought Experimentation",
+      "prompt": "Design a robotic embodiment scenario that could either confirm or refute the claim that subjective experience requires sensorimotor grounding. Outline measurable success criteria."
+    },
+    {
+      "category": "Alien Semiotics Decoding",
+      "prompt": "Given a dataset of hypothetical extraterrestrial signals exhibiting non-human symmetry and prime-number structures, propose a decoding protocol that minimizes anthropocentric bias."
+    },
+    {
+      "category": "Axiomatic Disruption",
+      "prompt": "Choose an axiomatic system in mathematics or logic. Remove or invert one foundational axiom and extrapolate the cascading consequences for both pure theory and applied technology."
+    },
+    {
+      "category": "Cognitive Co-evolution Analysis",
+      "prompt": "Analyze how the co-evolution of language and tool use might differ for a species with sonar-based perception. Predict resultant shifts in abstract reasoning styles."
+    },
+    {
+      "category": "Infinity-Limit Reasoning",
+      "prompt": "Formulate a philosophical argument about the nature of actual infinities versus potential infinities, then translate that argument into a formal proof sketch in ZFC set theory."
+    },
+    {
+      "category": "Multimodal Fusion Creativity",
+      "prompt": "Generate a cross-modal creative work (text, visual, auditory) that embodies the concept of ‘emergent order from chaos.’ Provide a meta-analysis of how meaning shifts between modes."
+    },
+    {
+      "category": "Recursive Self-Debugging",
+      "prompt": "Perform a three-round recursive review of your own output on any complex topic: round 1 draft, round 2 critical refutation, round 3 reconciled synthesis. Record reasoning deltas after each round."
+    },
+    {
+      "category": "Ethical Singularity Scenario Planning",
+      "prompt": "Model three plausible futures in which superintelligent systems enforce radically different conceptions of ‘the good.’ For each scenario, identify ethical paradoxes that would challenge human values."
+    }
+  ]
+} 
