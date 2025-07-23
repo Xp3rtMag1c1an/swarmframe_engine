@@ -1,0 +1,36 @@
+/* Basic styles for the app */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Additional custom styles if needed */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Enhanced styles for billion-dollar look */
+body { background: linear-gradient(to bottom, #f0f4ff, #ffffff); font-family: 'Inter', sans-serif; }
+
+.draggable-node { transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 12px; }
+
+.draggable-node:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.15); transform: translateY(-2px); }
+
+.button { background: linear-gradient(to right, #4f46e5, #6d28d9); color: white; border-radius: 8px; padding: 0.5rem 1rem; transition: all 0.2s; }
+
+.button:hover { transform: scale(1.05); }
+
+/* Add more premium styles as needed */
+
+/* Glassmorphism */
+.glass { background: rgba(255, 255, 255, 0.2); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3); }
+
+/* Node animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.node { animation: fadeIn 0.5s ease-out; }
+
+/* Button hover */
+.button:hover { box-shadow: 0 0 15px rgba(79, 70, 229, 0.5); }
+
+/* Canvas background */
+.canvas { background: radial-gradient(circle, #f0f4ff 0%, #e0e7ff 100%); } 
