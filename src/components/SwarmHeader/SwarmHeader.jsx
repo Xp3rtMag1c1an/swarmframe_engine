@@ -14,7 +14,8 @@ export default function SwarmHeader() {
   const [isOllamaConnected, setIsOllamaConnected] = useState(false);
 
   useEffect(() => {
-    fetch(process.env.OLLAMA_BASE_URL || 'http://localhost:11434/api/version')
+    const ollamaUrl = process.env.REACT_APP_OLLAMA_BASE_URL || 'http://localhost:11434';
+    fetch(`${ollamaUrl}/api/version`)
       .then(() => setIsOllamaConnected(true))
       .catch(() => setIsOllamaConnected(false));
   }, []);

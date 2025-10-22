@@ -2,6 +2,7 @@ import { loadPromptsForNode } from '../services/supermemoryService';
 import { useSwarmStore } from '../stores/swarmStore';
 import { executePrompt } from './promptExecutor';
 import { storePrompt, retrievePrompts } from './supermemoryIntegration';
+import { personaDna } from '../data/personaDna';
 
 export class SwarmRunner {
   constructor() {

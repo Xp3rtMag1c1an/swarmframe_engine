@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { creativeArchitectSwarm } from '../data/swarmTemplates';
+import { personaDna } from '../data/personaDna';
 
 export const useSwarmStore = create(
   devtools(

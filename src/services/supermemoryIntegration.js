@@ -1,5 +1,5 @@
-const API_KEY = 'sm_ZiiKL4fBjZTN8WuSNb7iWK_XfpLqzptGOCyikpHqJaNEdNnhCpZLaFwkGGJGgbqYvbXLMzUWjNcUoIZNhlNLLTA';
-const BASE_URL = 'https://api.supermemory.ai/v1'; // Assuming based on typical API structures; adjust if needed
+const API_KEY = process.env.REACT_APP_SUPERMEMORY_API_KEY || '';
+const BASE_URL = process.env.REACT_APP_SUPERMEMORY_BASE_URL || 'https://api.supermemory.ai/v1';
 
 export async function storePrompt(promptData) {
   try {

@@ -11,7 +11,7 @@ export async function executePrompt(promptTemplate, context = {}) {
   });
 
   // Determine model based on context or default
-  const defaultModel = process.env.OLLAMA_DEFAULT_MODEL || 'llama3.1:8b';
+  const defaultModel = process.env.REACT_APP_OLLAMA_DEFAULT_MODEL || 'llama3.1:8b';
   let model = defaultModel;
   if (context.config?.model) {
     model = context.config.model;
@@ -30,7 +30,7 @@ export async function executePrompt(promptTemplate, context = {}) {
     }
   }
 
-  const baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+  const baseUrl = process.env.REACT_APP_OLLAMA_BASE_URL || 'http://localhost:11434';
   const url = `${baseUrl}/api/generate`;
 
   const body = {
