@@ -1,51 +1,85 @@
-// promptExecutor.js with Ollama integration
+/**
+ * Prompt Executor — Gemini API
+ * Now supports anatomy-derived system instructions from the Blueprint layer.
+ */
 
-export async function executePrompt(promptTemplate, context = {}) {
-  // Replace placeholders in prompt
-  let prompt = promptTemplate;
-  Object.entries(context).forEach(([key, value]) => {
-    if (typeof value === 'object') {
-      value = JSON.stringify(value);
-    }
-    prompt = prompt.replace(new RegExp(`{{${key}}}`, 'g'), value);
-  });
+const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-  // Determine model based on context or default
-  const defaultModel = process.env.OLLAMA_DEFAULT_MODEL || 'llama3.1:8b';
-  let model = defaultModel;
-  if (context.config?.model) {
-    model = context.config.model;
-  } else if (context.nodeType) {
-    // Example model routing based on node type
-    switch (context.nodeType) {
-      case 'creative':
-        model = 'llama3.1:8b';
-        break;
-      case 'logic':
-        model = 'llama3.1:70b';
-        break;
-      case 'code':
-        model = 'codellama:7b';
-        break;
-    }
+const MODEL_FOR_NODE = {
+  cortex:   'gemini-2.5-pro',   // analytical, structured — Pro for deep reasoning
+  sentinel: 'gemini-2.5-pro',   // evaluation/scoring — Pro for rigorous analysis
+  synth:    'gemini-2.5-pro',   // final synthesis — Pro for highest quality output
+  muse:     'gemini-2.5-flash', // creative, expressive — Flash is fast + creative
+  looper:   'gemini-2.5-flash', // variant generation — Flash for quick iterations
+  critic:   'gemini-2.5-pro',   // adversarial testing — Pro for stress-testing
+};
+
+const DEFAULT_MODEL = 'gemini-2.5-flash';
+
+function buildPrompt(template, context) {
+  let prompt = template;
+  for (const [key, value] of Object.entries(context)) {
+    const replacement = typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value);
+    prompt = prompt.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), replacement);
+  }
+  return prompt;
+}
+
+/**
+ * Execute a prompt against the Google Gemini API.
+ *
+ * @param {string} promptTemplate - The prompt with {{placeholder}} syntax
+ * @param {object} context - Values to interpolate + config
+ * @param {string} [systemInstruction] - System instruction from anatomyEngine (Blueprint layer)
+ * @returns {string} The generated text
+ */
+export async function executePrompt(promptTemplate, context = {}, systemInstruction = null) {
+  if (!GEMINI_API_KEY) {
+    throw new Error(
+      'REACT_APP_GEMINI_API_KEY is not set. Add it to your .env file and restart the dev server.'
+    );
   }
 
-  const baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-  const url = `${baseUrl}/api/generate`;
+  const prompt = buildPrompt(promptTemplate, context);
+
+  const nodeType = context.nodeType || 'default';
+  const model = context.config?.model || MODEL_FOR_NODE[nodeType] || DEFAULT_MODEL;
+
+  const temperature =
+    context.config?.temperature ??
+    (nodeType === 'muse' || nodeType === 'looper' ? 0.85 : 0.4);
+
+  // Gemini 2.5 Pro (thinking model) needs generous token budget
+  const tokenFloor = model.includes('pro') ? 2048 : 1024;
+  const maxOutputTokens = Math.max(context.config?.maxTokens ?? 0, tokenFloor);
+
+  const url = `${GEMINI_BASE_URL}/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
   const body = {
-    model,
-    prompt,
-    stream: true, // Enable streaming
-    options: {
-      temperature: context.config?.temperature || 0.7,
-      num_predict: context.config?.maxTokens || 500,
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature,
+      maxOutputTokens,
+      topP: 0.95,
+      topK: 40,
     },
+    safetySettings: [
+      { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH',        threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',  threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT',  threshold: 'BLOCK_NONE' },
+    ],
   };
+
+  // Inject anatomy system instruction if provided (Blueprint layer active)
+  if (systemInstruction) {
+    body.systemInstruction = { parts: [{ text: systemInstruction }] };
+  }
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     const response = await fetch(url, {
       method: 'POST',
@@ -57,39 +91,24 @@ export async function executePrompt(promptTemplate, context = {}) {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.statusText}`);
+      const errorBody = await response.json().catch(() => ({}));
+      const msg = errorBody?.error?.message || response.statusText;
+      throw new Error(`Gemini API error (${response.status}): ${msg}`);
     }
 
-    const reader = response.body.getReader();
-    let result = '';
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = new TextDecoder().decode(value);
-      const lines = chunk.split('\n').filter(line => line.trim());
-      for (const line of lines) {
-        const parsed = JSON.parse(line);
-        if (parsed.response) {
-          result += parsed.response;
-        }
-        if (parsed.done) {
-          break;
-        }
-      }
+    if (!text) {
+      const finishReason = data?.candidates?.[0]?.finishReason;
+      throw new Error(`Gemini returned no text. Finish reason: ${finishReason || 'unknown'}`);
     }
 
-    return result.trim();
+    return text.trim();
   } catch (error) {
     if (error.name === 'AbortError') {
-      throw new Error('Request timed out after 30 seconds');
-    }
-    if (error.message.includes('ECONNREFUSED')) {
-      throw new Error('Ollama server is offline. Please start Ollama and try again.');
-    }
-    if (error.message.includes('model')) {
-      throw new Error(`Model '${model}' not found. Falling back to default or pull the model with 'ollama pull ${model}'.`);
+      throw new Error('Gemini request timed out after 60 seconds');
     }
     throw error;
   }
-} 
+}

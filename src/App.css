@@ -1,36 +1,270 @@
-/* Basic styles for the app */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Additional custom styles if needed */
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+/* ═══════════════════════════════════════════════════
+   LOGOS ENGINE — DARK THEME FOUNDATION
+   ═══════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-base:      #04070f;
+  --bg-surface:   #080e1c;
+  --bg-card:      #0c1526;
+  --bg-card2:     #101c30;
+  --border:       #162038;
+  --border2:      #1e3052;
+  --ink:          #e2e8f8;
+  --ink2:         #8ea5c8;
+  --ink3:         #4a6080;
+
+  /* Node colors */
+  --c-cortex:     #3b82f6;
+  --c-looper:     #10b981;
+  --c-muse:       #8b5cf6;
+  --c-sentinel:   #f59e0b;
+  --c-synth:      #06b6d4;
+  --c-critic:     #ef4444;
 }
 
-/* Enhanced styles for billion-dollar look */
-body { background: linear-gradient(to bottom, #f0f4ff, #ffffff); font-family: 'Inter', sans-serif; }
+* { box-sizing: border-box; }
 
-.draggable-node { transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 12px; }
+body {
+  margin: 0;
+  background: var(--bg-base);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
-.draggable-node:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.15); transform: translateY(-2px); }
+/* ── Canvas ──────────────────────────────────────── */
+.logos-canvas {
+  background-color: var(--bg-surface);
+  background-image: radial-gradient(circle, #192540 1px, transparent 1px);
+  background-size: 24px 24px;
+}
 
-.button { background: linear-gradient(to right, #4f46e5, #6d28d9); color: white; border-radius: 8px; padding: 0.5rem 1rem; transition: all 0.2s; }
+/* ReactFlow override */
+.react-flow__background { background: var(--bg-surface) !important; }
+.react-flow__minimap { background: var(--bg-card) !important; border: 1px solid var(--border) !important; border-radius: 8px !important; }
+.react-flow__minimap-mask { fill: rgba(4, 7, 15, 0.7) !important; }
+.react-flow__controls { background: var(--bg-card) !important; border: 1px solid var(--border) !important; border-radius: 8px !important; overflow: hidden; }
+.react-flow__controls-button { background: var(--bg-card) !important; border-color: var(--border) !important; fill: var(--ink2) !important; }
+.react-flow__controls-button:hover { background: var(--bg-card2) !important; fill: var(--ink) !important; }
+.react-flow__attribution { display: none; }
 
-.button:hover { transform: scale(1.05); }
+/* ── Node Cards ──────────────────────────────────── */
+.node-card {
+  background: rgba(12, 21, 38, 0.97);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 272px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
 
-/* Add more premium styles as needed */
+.node-card:hover { border-color: var(--border2); }
 
-/* Glassmorphism */
-.glass { background: rgba(255, 255, 255, 0.2); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3); }
+/* Colored top accent line */
+.node-accent {
+  height: 3px;
+  width: 100%;
+  opacity: 0.9;
+  border-radius: 12px 12px 0 0;
+}
 
-/* Node animations */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.node { animation: fadeIn 0.5s ease-out; }
+/* State: idle */
+.node-card.idle  { box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
 
-/* Button hover */
-.button:hover { box-shadow: 0 0 15px rgba(79, 70, 229, 0.5); }
+/* State: executing — pulsing glow */
+.node-card.executing {
+  animation: nodeExecutePulse 1.5s ease-in-out infinite;
+}
 
-/* Canvas background */
-.canvas { background: radial-gradient(circle, #f0f4ff 0%, #e0e7ff 100%); } 
+/* State: complete — steady glow */
+.node-card.complete { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+
+/* Per-node executing colors */
+.node-card.executing.cortex   { border-color: rgba(59, 130, 246, 0.7); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 0 30px rgba(59, 130, 246, 0.25); }
+.node-card.executing.looper   { border-color: rgba(16, 185, 129, 0.7); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2), 0 0 30px rgba(16, 185, 129, 0.25); }
+.node-card.executing.muse     { border-color: rgba(139, 92, 246, 0.7); box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2), 0 0 30px rgba(139, 92, 246, 0.25); }
+.node-card.executing.sentinel { border-color: rgba(245, 158, 11, 0.7); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2), 0 0 30px rgba(245, 158, 11, 0.25); }
+.node-card.executing.synth    { border-color: rgba(6, 182, 212, 0.7);  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2),  0 0 30px rgba(6, 182, 212, 0.25);  }
+
+@keyframes nodeExecutePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* ── Anatomy Bars ─────────────────────────────────── */
+.anatomy-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border2);
+  overflow: hidden;
+}
+.anatomy-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Edge Glow ────────────────────────────────────── */
+@keyframes edgeFlow {
+  from { stroke-dashoffset: 24; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.edge-flow {
+  stroke-dasharray: 6 6;
+  animation: edgeFlow 1.2s linear infinite;
+}
+
+/* ── Scrollbars ───────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink3); }
+
+/* ── Inputs / Selects ─────────────────────────────── */
+.logos-input {
+  background: rgba(22, 32, 56, 0.6);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 0.8125rem;
+  padding: 5px 10px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.logos-input:focus { border-color: var(--c-cortex); }
+.logos-input::placeholder { color: var(--ink3); }
+.logos-input option { background: #0c1526; }
+
+/* ── Textarea inside nodes ────────────────────────── */
+.node-textarea {
+  background: rgba(4, 7, 15, 0.6);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  padding: 8px;
+  resize: none;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+}
+.node-textarea:focus { border-color: var(--c-cortex); }
+
+/* ── Prompt preview box ───────────────────────────── */
+.prompt-preview {
+  background: rgba(4, 7, 15, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--ink2);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.prompt-preview:hover { border-color: var(--border2); background: rgba(16, 25, 48, 0.7); color: var(--ink); }
+
+/* ── Result Preview ───────────────────────────────── */
+.result-preview {
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  color: #6ee7b7;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  padding: 8px 10px;
+}
+
+/* ── Spinning loader ──────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+/* ── Tag badges ───────────────────────────────────── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 99px;
+  border: 1px solid;
+}
+
+/* ── Run button ───────────────────────────────────── */
+.btn-run {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 7px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.02em;
+  transition: box-shadow 0.2s, transform 0.15s, opacity 0.2s;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+}
+.btn-run:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.55); transform: translateY(-1px); }
+.btn-run:active { transform: translateY(0); }
+.btn-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── Secondary button ─────────────────────────────── */
+.btn-ghost {
+  background: rgba(22, 32, 56, 0.5);
+  color: var(--ink2);
+  font-size: 0.8125rem;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-ghost:hover { background: rgba(30, 48, 82, 0.7); color: var(--ink); border-color: #2a4070; }
+.btn-ghost.active { background: rgba(59, 130, 246, 0.1); color: #93c5fd; border-color: rgba(59, 130, 246, 0.4); }
+
+/* ── Tab buttons ──────────────────────────────────── */
+.tab-btn {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.tab-btn:hover { color: var(--ink2); }
+.tab-btn.active {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+}
+
+/* ── Log entry colors ─────────────────────────────── */
+.log-blueprint  { color: #60a5fa; }
+.log-codex-pass { color: #34d399; }
+.log-codex-fail { color: #fbbf24; }
+.log-upe        { color: #c084fc; }
+.log-complete   { color: #818cf8; }
+.log-error      { color: #f87171; }
+.log-stage      { color: var(--ink2); }
+.log-default    { color: var(--ink3); }

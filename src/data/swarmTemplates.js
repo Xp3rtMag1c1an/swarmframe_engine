@@ -34,7 +34,7 @@ export const creativeArchitectSwarm = {
         },
         "config": {
           "temperature": 0.3,
-          "maxTokens": 500,
+          "maxTokens": 2048,
           "stopSequences": ["---", "END_ANALYSIS"]
         },
         "outputFormat": "structured_list"
@@ -48,7 +48,7 @@ export const creativeArchitectSwarm = {
         "role": "Looper Node",
         "persona": "Iterative Refiner",
         "description": "Generate multiple solution variants",
-        "prompt": "Take this analysis: {{input.cortex}} and generate 3 distinct architectural approaches. Each should address the constraints differently. Vary: scale, materials, community integration. Present as [Approach A], [Approach B], [Approach C].",
+        "prompt": "Take this analysis: {{cortex}} and generate 3 distinct architectural approaches. Each should address the constraints differently. Vary: scale, materials, community integration. Present as [Approach A], [Approach B], [Approach C].",
         "anatomy": {
           "logic": 0.7,
           "creativity": 0.9,
@@ -57,7 +57,7 @@ export const creativeArchitectSwarm = {
         },
         "config": {
           "temperature": 0.7,
-          "maxTokens": 800,
+          "maxTokens": 1500,
           "iterations": 3,
           "diversityBoost": true
         },
@@ -72,7 +72,7 @@ export const creativeArchitectSwarm = {
         "role": "Muse Node",
         "persona": "Poetic Visionary",
         "description": "Add narrative depth and sensory details",
-        "prompt": "Transform these architectural concepts: {{input.looper}} into vivid, human-centered narratives. Paint the experience of living in these spaces. Add metaphors that connect architecture to nature, community, and human flourishing. Make it inspiring yet grounded.",
+        "prompt": "Transform these architectural concepts: {{looper}} into vivid, human-centered narratives. Paint the experience of living in these spaces. Add metaphors that connect architecture to nature, community, and human flourishing. Make it inspiring yet grounded.",
         "anatomy": {
           "logic": 0.4,
           "creativity": 1.0,
@@ -81,7 +81,7 @@ export const creativeArchitectSwarm = {
         },
         "config": {
           "temperature": 0.8,
-          "maxTokens": 1000,
+          "maxTokens": 1500,
           "stylePrompts": ["poetic", "humanistic", "experiential"]
         },
         "outputFormat": "narrative_rich"
@@ -95,7 +95,7 @@ export const creativeArchitectSwarm = {
         "role": "Sentinel Node", 
         "persona": "Quality Guardian",
         "description": "Critical evaluation and constraint checking",
-        "prompt": "Evaluate these architectural visions: {{input.muse}}. Check against: sustainability metrics, cost feasibility, regulatory compliance, social impact. Flag concerns and suggest refinements. Score each approach on a 1-10 scale across these dimensions.",
+        "prompt": "Evaluate these architectural visions: {{muse}}. Check against: sustainability metrics, cost feasibility, regulatory compliance, social impact. Flag concerns and suggest refinements. Score each approach on a 1-10 scale across these dimensions.",
         "anatomy": {
           "logic": 1.0,
           "creativity": 0.3,
@@ -104,7 +104,7 @@ export const creativeArchitectSwarm = {
         },
         "config": {
           "temperature": 0.2,
-          "maxTokens": 600,
+          "maxTokens": 2048,
           "evaluationCriteria": ["sustainability", "feasibility", "compliance", "impact"],
           "scoringEnabled": true
         },
@@ -119,7 +119,7 @@ export const creativeArchitectSwarm = {
         "role": "Synth Node",
         "persona": "Master Synthesizer", 
         "description": "Final integration and polished output",
-        "prompt": "Synthesize the creative vision {{input.muse}} with the critical evaluation {{input.sentinel}}. Create a final architectural proposal that balances inspiration with practicality. Include: concept overview, key innovations, implementation roadmap, and compelling visual descriptions. Tone: {{signal.tone}}",
+        "prompt": "Synthesize the creative vision {{muse}} with the critical evaluation {{sentinel}}. Create a final architectural proposal that balances inspiration with practicality. Include: concept overview, key innovations, implementation roadmap, and compelling visual descriptions. Tone: {{signal.tone}}",
         "anatomy": {
           "logic": 0.8,
           "creativity": 0.7,
@@ -128,7 +128,7 @@ export const creativeArchitectSwarm = {
         },
         "config": {
           "temperature": 0.5,
-          "maxTokens": 1500,
+          "maxTokens": 3000,
           "synthesisMode": "balanced_integration"
         },
         "outputFormat": "final_proposal"

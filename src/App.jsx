@@ -7,47 +7,47 @@ import OutputViewer from './components/OutputPanel/OutputViewer';
 import { useSwarmStore } from './stores/swarmStore';
 import './App.css';
 
-function App() {
+export default function App() {
   const { isExecuting, showOutput } = useSwarmStore();
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Header Bar */}
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#04070f', overflow: 'hidden' }}>
+
       <SwarmHeader />
-      
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Canvas Area */}
-        <div className="flex-1 relative">
+
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
+        {/* Canvas */}
+        <div style={{ flex: 1, position: 'relative' }}>
           <ReactFlowProvider>
             <SwarmCanvas />
           </ReactFlowProvider>
-          
-          {/* Execution Overlay */}
+
+          {/* Executing overlay — subtle, non-blocking */}
           {isExecuting && (
-            <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 shadow-xl">
-                <div className="flex items-center space-x-3">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-                  <span className="text-lg font-medium">Swarm Executing...</span>
-                </div>
-              </div>
+            <div style={{
+              position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)',
+              background: 'rgba(8,14,28,0.9)', border: '1px solid rgba(59,130,246,0.3)',
+              borderRadius: 8, padding: '7px 16px', display: 'flex', alignItems: 'center', gap: 8,
+              backdropFilter: 'blur(12px)', zIndex: 20,
+              boxShadow: '0 0 20px rgba(59,130,246,0.2)',
+            }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 8px #3b82f6', animation: 'pulse 1.5s ease-in-out infinite' }} />
+              <span style={{ fontSize: '0.75rem', color: '#93c5fd', fontWeight: 500, letterSpacing: '0.04em' }}>
+                Logos Engine executing
+              </span>
             </div>
           )}
         </div>
-        
-        {/* Output Panel (Collapsible) */}
+
+        {/* Output panel */}
         {showOutput && (
-          <div className="w-96 border-l bg-white">
+          <div style={{ width: 360, flexShrink: 0 }}>
             <OutputViewer />
           </div>
         )}
       </div>
-      
-      {/* Signal Bus Console */}
+
       <SignalBusConsole />
     </div>
   );
 }
-
-export default App; 
