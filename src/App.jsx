@@ -1,53 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ReactFlowProvider } from 'reactflow';
-import SwarmCanvas from './components/SwarmCanvas/SwarmCanvas';
-import SwarmHeader from './components/SwarmHeader/SwarmHeader';
-import SignalBusConsole from './components/SignalBus/SignalBusConsole';
-import OutputViewer from './components/OutputPanel/OutputViewer';
-import { useSwarmStore } from './stores/swarmStore';
-import './App.css';
+import { useStore } from './store.js';
+import TopBar from './components/TopBar.jsx';
+import MissionPanel from './components/MissionPanel.jsx';
+import Canvas from './components/Canvas.jsx';
+import Inspector from './components/Inspector.jsx';
+import SignalLog from './components/SignalLog.jsx';
 
 export default function App() {
-  const { isExecuting, showOutput } = useSwarmStore();
+  useEffect(() => { useStore.getState().init(); }, []);
+  const backend = useStore((s) => s.backend);
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#04070f', overflow: 'hidden' }}>
-
-      <SwarmHeader />
-
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
-        {/* Canvas */}
-        <div style={{ flex: 1, position: 'relative' }}>
+    <div className="app">
+      <TopBar />
+      {backend.id === 'mock' && backend.mode === 'server' && (
+        <div className="banner">Demo mode — the backend is up but has no API key. Add <code>ANTHROPIC_API_KEY</code> to <code>.env</code> and restart <code>npm run dev</code> to route through Claude.</div>
+      )}
+      <div className="workspace">
+        <MissionPanel />
+        <main className="stage">
           <ReactFlowProvider>
-            <SwarmCanvas />
+            <Canvas />
           </ReactFlowProvider>
-
-          {/* Executing overlay — subtle, non-blocking */}
-          {isExecuting && (
-            <div style={{
-              position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)',
-              background: 'rgba(8,14,28,0.9)', border: '1px solid rgba(59,130,246,0.3)',
-              borderRadius: 8, padding: '7px 16px', display: 'flex', alignItems: 'center', gap: 8,
-              backdropFilter: 'blur(12px)', zIndex: 20,
-              boxShadow: '0 0 20px rgba(59,130,246,0.2)',
-            }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 8px #3b82f6', animation: 'pulse 1.5s ease-in-out infinite' }} />
-              <span style={{ fontSize: '0.75rem', color: '#93c5fd', fontWeight: 500, letterSpacing: '0.04em' }}>
-                Logos Engine executing
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Output panel */}
-        {showOutput && (
-          <div style={{ width: 360, flexShrink: 0 }}>
-            <OutputViewer />
-          </div>
-        )}
+          <SignalLog />
+        </main>
+        <Inspector />
       </div>
-
-      <SignalBusConsole />
     </div>
   );
 }
