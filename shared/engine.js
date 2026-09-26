@@ -98,6 +98,18 @@ export async function runSwarm({ nodes, edges, mission, options = {}, provider, 
 
   const log = (level, message, id) => emit('log', { level, message, id });
 
+  // Judges are advisory: if a (small, local) model can't produce valid JSON,
+  // log it and keep the node's output rather than failing the node.
+  async function judge(layer, id, args) {
+    try {
+      return await provider.json({ ...args, tier: 'fast', abortSignal });
+    } catch (err) {
+      if (aborted()) return null;
+      log('warn', `${layer} skipped — ${err.message}`, id);
+      return null;
+    }
+  }
+
   async function streamPass(node, system, prompt, pass) {
     const tier = tierFor(node);
     emit('node_start', { id: node.id, pass, model: provider.modelFor(tier) });
@@ -130,13 +142,16 @@ export async function runSwarm({ nodes, edges, mission, options = {}, provider, 
     // ── Soul: CODEX ──
     if (opts.codex) {
       const { system: cs, prompt: cp } = codexPrompt(output, node.type, mission);
-      const codex = finalizeCodex(await provider.json({ system: cs, prompt: cp, schema: CODEX_SCHEMA, tier: 'fast', abortSignal }));
-      emit('codex', { id: node.id, result: codex });
-      log(codex.approved ? 'pass' : 'warn', `CODEX ${Math.round(codex.score * 100)}%${codex.violations.length ? ` — ${codex.violations.join(', ')}` : ''}`, node.id);
+      const raw = await judge('CODEX', node.id, { system: cs, prompt: cp, schema: CODEX_SCHEMA });
+      const codex = raw && finalizeCodex(raw);
+      if (codex) {
+        emit('codex', { id: node.id, result: codex });
+        log(codex.approved ? 'pass' : 'warn', `CODEX ${Math.round(codex.score * 100)}%${codex.violations.length ? ` — ${codex.violations.join(', ')}` : ''}`, node.id);
 
-      if (!codex.approved && codex.directive && !aborted()) {
-        emit('node_reset', { id: node.id, reason: 'CODEX revision' });
-        output = await streamPass(node, system, refinementPrompt(output, codex.directive), ++passes);
+        if (!codex.approved && codex.directive && !aborted()) {
+          emit('node_reset', { id: node.id, reason: 'CODEX revision' });
+          output = await streamPass(node, system, refinementPrompt(output, codex.directive), ++passes);
+        }
       }
     }
 
@@ -145,7 +160,9 @@ export async function runSwarm({ nodes, edges, mission, options = {}, provider, 
       let refinements = 0;
       while (!aborted()) {
         const { system: us, prompt: up } = upePrompt(output, node.type, mission);
-        const upe = finalizeUPE(await provider.json({ system: us, prompt: up, schema: UPE_SCHEMA, tier: 'fast', abortSignal }));
+        const raw = await judge('UPE', node.id, { system: us, prompt: up, schema: UPE_SCHEMA });
+        if (!raw) break;
+        const upe = finalizeUPE(raw);
         emit('upe', { id: node.id, result: { ...upe, pass: passes } });
         log(upe.shouldRefine ? 'warn' : 'pass', `UPE ${Math.round(upe.composite * 100)}%${upe.shouldRefine ? ' — below threshold' : ''}`, node.id);
 

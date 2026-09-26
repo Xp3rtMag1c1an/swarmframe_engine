@@ -51,11 +51,15 @@ function validateGraph(body) {
 }
 
 export function createApiHandler() {
-  const provider = selectProvider();
-  console.log(`[swarmframe] LLM provider: ${provider.describe().label} ${JSON.stringify(provider.describe().models)}`);
+  const ready = selectProvider().then((p) => {
+    console.log(`[swarmframe] LLM provider: ${p.describe().label} ${JSON.stringify(p.describe().models)}`);
+    return p;
+  });
 
   return async function handle(req, res, next) {
     const url = new URL(req.url, 'http://localhost');
+    if (!url.pathname.startsWith('/api/')) return next?.();
+    const provider = await ready;
 
     if (url.pathname === '/api/status' && req.method === 'GET') {
       return sendJson(res, 200, { provider: provider.describe() });
@@ -93,7 +97,6 @@ export function createApiHandler() {
       return;
     }
 
-    if (url.pathname.startsWith('/api/')) return sendJson(res, 404, { error: 'not found' });
-    return next?.();
+    return sendJson(res, 404, { error: 'not found' });
   };
 }

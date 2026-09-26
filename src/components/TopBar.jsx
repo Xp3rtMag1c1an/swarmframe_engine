@@ -16,7 +16,7 @@ function ProviderPill({ backend }) {
   const title = demo
     ? backend.mode === 'browser'
       ? 'No backend reachable — running the engine in your browser with the demo provider.'
-      : 'Backend running without an API key — add ANTHROPIC_API_KEY (or GEMINI_API_KEY) to .env and restart.'
+      : 'No model found — start Ollama (ollama serve) or add a GROQ_API_KEY / OPENROUTER_API_KEY to .env, then restart.'
     : `heavy: ${backend.models.heavy} · fast: ${backend.models.fast}`;
   return (
     <span className={`provider ${demo ? 'is-demo' : 'is-live'}`} title={title}>

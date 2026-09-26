@@ -15,7 +15,7 @@ export default function App() {
     <div className="app">
       <TopBar />
       {backend.id === 'mock' && backend.mode === 'server' && (
-        <div className="banner">Demo mode — the backend is up but has no API key. Add <code>ANTHROPIC_API_KEY</code> to <code>.env</code> and restart <code>npm run dev</code> to route through Claude.</div>
+        <div className="banner">Demo mode — no model found. Run <code>ollama serve</code> + <code>ollama pull llama3.1:8b</code> (free, local), or put a free <code>GROQ_API_KEY</code> in <code>.env</code>, then restart <code>npm run dev</code>.</div>
       )}
       <div className="workspace">
         <MissionPanel />
