@@ -3,7 +3,7 @@
  * Now supports anatomy-derived system instructions from the Blueprint layer.
  */
 
-const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+import { getApiKey } from './apiKey';
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 const MODEL_FOR_NODE = {
@@ -35,9 +35,9 @@ function buildPrompt(template, context) {
  * @returns {string} The generated text
  */
 export async function executePrompt(promptTemplate, context = {}, systemInstruction = null) {
-  if (!GEMINI_API_KEY) {
+  if (!getApiKey()) {
     throw new Error(
-      'REACT_APP_GEMINI_API_KEY is not set. Add it to your .env file and restart the dev server.'
+      'No Gemini API key. Click "+ API Key" in the header and paste your key (stored only in this browser), or set REACT_APP_GEMINI_API_KEY and rebuild.'
     );
   }
 
@@ -54,7 +54,7 @@ export async function executePrompt(promptTemplate, context = {}, systemInstruct
   const tokenFloor = model.includes('pro') ? 2048 : 1024;
   const maxOutputTokens = Math.max(context.config?.maxTokens ?? 0, tokenFloor);
 
-  const url = `${GEMINI_BASE_URL}/${model}:generateContent?key=${GEMINI_API_KEY}`;
+  const url = `${GEMINI_BASE_URL}/${model}:generateContent?key=${getApiKey()}`;
 
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
