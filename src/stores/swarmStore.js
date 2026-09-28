@@ -2,6 +2,14 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { creativeArchitectSwarm } from '../data/swarmTemplates';
 import { personaDna } from '../data/personaDna';
+import {
+  DEMO_SIGNAL,
+  DEMO_RESULTS,
+  DEMO_UPE,
+  DEMO_CRITIC_PROBES,
+  DEMO_LOG_OPEN,
+  DEMO_STAGE_LABELS,
+} from '../data/demoRun';
 
 export const useSwarmStore = create(
   devtools(
@@ -81,14 +89,78 @@ export const useSwarmStore = create(
           upeScores: {},
         }),
 
-      stopExecution: () =>
-        set((state) => ({
+      // ─── Execution Control ──────────────────────────────────────
+      stopExecution: () => {
+        set((s) => ({
           isExecuting: false,
-          globalSignal: {
-            ...state.globalSignal,
-            goalProgress: 1,
-          },
-        })),
+          globalSignal: { ...s.globalSignal, goalProgress: 1 },
+        }));
+        get().addExecutionLog({ type: 'info', message: 'Execution stopped.' });
+      },
+
+      // ─── Demo Mode ──────────────────────────────────────────────
+      // One-click pre-recorded swarm run. No API key needed.
+      loadDemoRun: () => {
+        const api = get();
+        api.startExecution();
+        api.updateSignalBus({
+          goal: DEMO_SIGNAL.goal,
+          tone: DEMO_SIGNAL.tone,
+          constraints: DEMO_SIGNAL.constraints,
+          targetOutput: DEMO_SIGNAL.targetOutput,
+          signalChange: 'DEMO_MODE',
+          goalProgress: 0,
+          outputHistory: [],
+          nodeOutputs: {},
+          rejectedPaths: [],
+        });
+        set({ showOutput: true });
+        api.addExecutionLog({ type: 'start', message: DEMO_LOG_OPEN });
+
+        const stages = ['cortex-1', 'looper-1', 'muse-1', 'sentinel-1', 'synth-1'];
+        stages.forEach((nodeId, i) => {
+          setTimeout(() => {
+            const a = get();
+            a.setCurrentStage(i);
+            a.addExecutionLog({
+              type: 'stage',
+              message: `Demo replay — ${DEMO_STAGE_LABELS[nodeId]} node output restored`,
+            });
+            a.updateExecutionResults(nodeId, DEMO_RESULTS[nodeId]);
+            // Demo stores the full text so the Output panel shows the whole debate
+            set((s) => ({
+              globalSignal: {
+                ...s.globalSignal,
+                nodeOutputs: {
+                  ...s.globalSignal.nodeOutputs,
+                  [nodeId]: DEMO_RESULTS[nodeId].result,
+                },
+              },
+            }));
+            a.updateNodeData(nodeId, { status: 'completed' });
+            a.setUPEScores(nodeId, DEMO_UPE[nodeId]);
+            if (nodeId === 'sentinel-1') {
+              a.addRejectedPath({
+                nodeId: 'looper-1',
+                variant: 'Stance 2 — The Ephemeral Purge',
+                reason: 'Terminated by Sentinel: forced amnesia degrades the system into a glorified search engine.',
+                timestamp: Date.now(),
+              });
+              // Critic adversarial probes hit the Signal Bus console
+              DEMO_CRITIC_PROBES.forEach((probe) =>
+                a.addExecutionLog({ type: 'feedback', message: probe })
+              );
+            }
+            if (i === stages.length - 1) {
+              a.stopExecution();
+              a.addExecutionLog({
+                type: 'complete',
+                message: 'Demo run complete — battle-tested position forged',
+              });
+            }
+          }, 650 * (i + 1));
+        });
+      },
 
       updateExecutionResults: (nodeId, result) =>
         set((state) => ({
