@@ -3,7 +3,7 @@ import { useSwarmStore } from '../../stores/swarmStore';
 import { swarmRunner } from '../../services/swarmRunner';
 
 export default function SwarmHeader() {
-  const { isExecuting, toggleOutput, showOutput, globalSignal, exportSwarm } = useSwarmStore();
+  const { isExecuting, toggleOutput, showOutput, globalSignal, exportSwarm, loadDemoRun } = useSwarmStore();
   const [geminiReady, setGeminiReady] = useState(false);
 
   useEffect(() => {
@@ -11,6 +11,8 @@ export default function SwarmHeader() {
   }, []);
 
   const handleRun = () => { if (!isExecuting) swarmRunner.runSwarm(); };
+
+  const handleDemo = () => { if (!isExecuting) loadDemoRun(); };
 
   const handleExport = () => {
     const data = exportSwarm();
@@ -51,6 +53,13 @@ export default function SwarmHeader() {
                 <span>Run Swarm</span>
               </>
             )}
+          </button>
+
+          <button onClick={handleDemo} disabled={isExecuting} className="btn-demo" title="One-click recorded swarm run — no API key needed">
+            <>
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.4 4.1L11.5 4l-3.3 2.7.9 4.3L6 8.5 2.9 11l.9-4.3L.5 4l4.1.1z"/></svg>
+              <span>Demo</span>
+            </>
           </button>
 
           <button onClick={handleExport} className="btn-ghost">
