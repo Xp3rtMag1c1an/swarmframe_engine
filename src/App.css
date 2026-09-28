@@ -222,6 +222,19 @@ body {
 .btn-run:active { transform: translateY(0); }
 .btn-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
+/* ── Demo button — the one-click path ─────────────────── */
+.btn-demo {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg, #7c3aed, #d946ef);
+  color: #fff; border: none; border-radius: 8px;
+  padding: 7px 14px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+  cursor: pointer; transition: all 0.18s ease;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.35);
+}
+.btn-demo:hover { box-shadow: 0 0 30px rgba(168, 85, 247, 0.6); transform: translateY(-1px); }
+.btn-demo:active { transform: translateY(0); }
+.btn-demo:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
 /* ── Secondary button ─────────────────────────────── */
 .btn-ghost {
   background: rgba(22, 32, 56, 0.5);
