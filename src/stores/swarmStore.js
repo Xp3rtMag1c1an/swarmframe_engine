@@ -207,6 +207,27 @@ export const useSwarmStore = create(
       toggleOutput: () => set((state) => ({ showOutput: !state.showOutput })),
       selectNode: (nodeId) => set({ selectedNode: nodeId }),
 
+      // BYOK — user-supplied Gemini key, stored only in this browser
+      userApiKey:
+        typeof localStorage !== 'undefined'
+          ? localStorage.getItem('swarmframe_gemini_key') || ''
+          : '',
+      setUserApiKey: (key) => {
+        try {
+          if (key) localStorage.setItem('swarmframe_gemini_key', key);
+          else localStorage.removeItem('swarmframe_gemini_key');
+        } catch {
+          /* private mode */
+        }
+        set({ userApiKey: key });
+        get().addExecutionLog({
+          type: 'info',
+          message: key
+            ? 'Gemini API key saved in this browser — live runs enabled.'
+            : 'Gemini API key cleared.',
+        });
+      },
+
       // Swarm Management
       loadSwarmTemplate: (template) =>
         set({
