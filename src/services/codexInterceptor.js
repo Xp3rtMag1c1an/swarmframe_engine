@@ -10,7 +10,7 @@
  * Returns: { approved, codexScore, violations, refinedOutput, layerResults }
  */
 
-const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+import { getApiKey } from './apiKey';
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const CODEX_MODEL = 'gemini-2.5-flash'; // Fast model for interceptor checks
 
@@ -69,7 +69,7 @@ const APPROVAL_THRESHOLD = 0.65; // minimum CODEX score to pass without refineme
  * @returns {{ approved, codexScore, violations, refinedOutput, layerResults }}
  */
 export async function runCodexCheck(output, nodeType, goal) {
-  if (!GEMINI_API_KEY || !output) {
+  if (!getApiKey() || !output) {
     return { approved: true, codexScore: 1, violations: [], refinedOutput: output, layerResults: {} };
   }
 
@@ -115,7 +115,7 @@ REFINED_OUTPUT:
 
   try {
     const response = await fetch(
-      `${GEMINI_BASE_URL}/${CODEX_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+      `${GEMINI_BASE_URL}/${CODEX_MODEL}:generateContent?key=${getApiKey()}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
