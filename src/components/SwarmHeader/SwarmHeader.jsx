@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSwarmStore } from '../../stores/swarmStore';
 import { swarmRunner } from '../../services/swarmRunner';
+import { getApiKey } from '../../services/apiKey';
 
 export default function SwarmHeader() {
-  const { isExecuting, toggleOutput, showOutput, globalSignal, exportSwarm, loadDemoRun } = useSwarmStore();
-  const [geminiReady, setGeminiReady] = useState(false);
-
-  useEffect(() => {
-    setGeminiReady(!!process.env.REACT_APP_GEMINI_API_KEY);
-  }, []);
+  const { isExecuting, toggleOutput, showOutput, globalSignal, exportSwarm, loadDemoRun, userApiKey, setUserApiKey } = useSwarmStore();
+  const [keyDraft, setKeyDraft] = useState('');
+  const [showKeyBox, setShowKeyBox] = useState(false);
+  const geminiReady = !!getApiKey();
 
   const handleRun = () => { if (!isExecuting) swarmRunner.runSwarm(); };
 
@@ -102,10 +101,41 @@ export default function SwarmHeader() {
         {/* Divider */}
         <div style={{ width: 1, height: 20, background: '#162038' }} />
 
-        {/* Gemini status */}
+        {/* Gemini BYOK */}
         <div className="flex items-center gap-1.5" style={{ fontSize: '0.72rem' }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: geminiReady ? '#10b981' : '#ef4444', boxShadow: geminiReady ? '0 0 6px #10b981' : '0 0 6px #ef4444', display: 'inline-block' }} />
-          <span style={{ color: '#8ea5c8' }}>{geminiReady ? 'Gemini 2.5' : 'No API Key'}</span>
+          {userApiKey ? (
+            <>
+              <span style={{ color: '#8ea5c8' }}>Gemini 2.5</span>
+              <button
+                onClick={() => setUserApiKey('')}
+                title="Remove the saved API key from this browser"
+                style={{ background: 'transparent', border: 'none', color: '#4a6080', cursor: 'pointer', fontSize: '0.9rem', lineHeight: 1, padding: '0 2px' }}
+              >×</button>
+            </>
+          ) : showKeyBox ? (
+            <>
+              <input
+                type="password"
+                value={keyDraft}
+                onChange={(e) => setKeyDraft(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && keyDraft.trim()) { setUserApiKey(keyDraft.trim()); setKeyDraft(''); setShowKeyBox(false); } if (e.key === 'Escape') { setKeyDraft(''); setShowKeyBox(false); } }}
+                placeholder="Paste Gemini API key"
+                autoFocus
+                style={{ width: 150, background: '#0b1426', border: '1px solid #243354', borderRadius: 6, color: '#e2e8f8', fontSize: '0.7rem', padding: '4px 8px', outline: 'none' }}
+              />
+              <button
+                onClick={() => { if (keyDraft.trim()) { setUserApiKey(keyDraft.trim()); setKeyDraft(''); setShowKeyBox(false); } }}
+                style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: 6, color: '#34d399', fontSize: '0.68rem', padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }}
+              >Save</button>
+            </>
+          ) : (
+            <button
+              onClick={() => setShowKeyBox(true)}
+              title="Use your own Gemini API key for live runs — stored only in this browser"
+              style={{ background: 'transparent', border: '1px dashed #2a3d5f', borderRadius: 6, color: '#8ea5c8', fontSize: '0.68rem', padding: '3px 9px', cursor: 'pointer' }}
+            >+ API Key</button>
+          )}
         </div>
       </div>
     </header>
