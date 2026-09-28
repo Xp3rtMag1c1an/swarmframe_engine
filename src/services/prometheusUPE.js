@@ -14,7 +14,7 @@
  *   5. Innovation  — originality, creative departure, novel framing
  */
 
-const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+import { getApiKey } from './apiKey';
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const UPE_MODEL = 'gemini-2.5-flash';
 
@@ -92,7 +92,7 @@ const ITERATION_THRESHOLD = 0.68; // composite score below this triggers Looper
  * @returns {{ scores, compositeScore, shouldIterate, feedback, dimensionBreakdown }}
  */
 export async function runUPEScoring(output, goal, nodeType = 'sentinel') {
-  if (!GEMINI_API_KEY || !output) {
+  if (!getApiKey() || !output) {
     return buildDefaultResult();
   }
 
@@ -150,7 +150,7 @@ OVERALL_ASSESSMENT: [2-3 sentence overall assessment]`;
 
   try {
     const response = await fetch(
-      `${GEMINI_BASE_URL}/${UPE_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+      `${GEMINI_BASE_URL}/${UPE_MODEL}:generateContent?key=${getApiKey()}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
